@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <!-- generado con https://www.favicon-generator.org/ -->
+  <link rel="apple-touch-icon" sizes="57x57" href="../../assets/imagen/favicon/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="../../assets/imagen/favicon/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="../../assets/imagen/favicon/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="../../assets/imagen/favicon/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="../../assets/imagen/favicon/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="../../assets/imagen/favicon/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="../../assets/imagen/favicon/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../../assets/imagen/favicon/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../../assets/imagen/favicon/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="../../assets/imagen/favicon/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/imagen/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../../assets/imagen/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../assets/imagen/favicon/favicon-16x16.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="../../assets/imagen/favicon/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Immobilis - Búsqueda</title>
+  <!-- Enlaces a las bibliotecas de Leaflet y OpenStreetMap -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <style>
+    /* Estilo básico para el mapa */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #mapid {
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="mapid"></div> <!-- Div donde se mostrará el mapa -->
+  <div id="loading-indicator">Cargando...</div>
+  <script>
+    var map;
+    var locations = [];
+    var urlParams = new URLSearchParams(window.location.search);
+    let id = urlParams.get('id');
+    let key = urlParams.get('key');
+
+    if (!id || !key) {
+      throw new Error("ID o clave no proporcionados en la URL");
+    }
+
+    var valores = 'Sheet1!A2:F';
+    var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + id + '/values/' + valores + '?key=' + key;
+
+    // Mostrar indicador de carga
+    $('#loading-indicator').show();
+
+    $.getJSON(url, function (data) {
+      // Ocultar indicador de carga una vez que se hayan cargado los datos
+      $('#loading-indicator').hide();
+
+      $(data.values).each(function () {
+        var location = {};
+        location.nombre = this[0];
+        location.lat = parseFloat(this[1]);
+        location.lng = parseFloat(this[2]);
+        location.dir = this[3];
+        location.URL = this[4];
+        location.des = this[5];
+        locations.push(location);
+      });
+
+      // Crear el mapa
+      var mymap = L.map('mapid'); // No establezcas una vista inicial aquí
+
+      // Añadir capa de OpenStreetMap al mapa
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(mymap);
+
+      // Iterar sobre los datos y añadir marcadores al mapa
+      locations.forEach(function(dato) {
+        // Crear marcador y vincular un pop-up con los datos adicionales
+        var marker = L.marker([dato.lat, dato.lng]).addTo(mymap);
+        
+        var popupContent = "<b>" + dato.nombre + "</b><br>" +
+                           "<b>Dirección:</b> " + dato.dir + "<br>" +
+                           "<b>Descripción:</b> " + dato.des + "<br>" +
+                           '<a href="' + dato.URL + '">Ver detalles</a>';
+        
+        marker.bindPopup(popupContent);
+      });
+
+      // Ajustar el mapa para que todos los marcadores sean visibles
+      var group = new L.featureGroup(locations.map(function(location) {
+        return L.marker([location.lat, location.lng]);
+      }));
+      mymap.fitBounds(group.getBounds());
+
+      var lat = urlParams.get('lat');
+      var lng = urlParams.get('lng');
+      var circleCenter = L.latLng(lat, lng);
+      var radius = urlParams.get('r');
+      var circle = L.circle(circleCenter, {
+        color: 'green',
+        weight: 1, // Grosor del borde
+        fillOpacity: 0, // Sin relleno
+        radius: radius
+      }).addTo(mymap);
+
+
+
+    });
+  </script>
+
+
+</body>
+</html>
