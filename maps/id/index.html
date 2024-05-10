@@ -89,7 +89,18 @@
       // Iterar sobre los datos y añadir marcadores al mapa
       locations.forEach(function(dato) {
         // Crear marcador y vincular un pop-up con los datos adicionales
-        var marker = L.marker([dato.lat, dato.lng]).addTo(mymap);
+        var markerColor;
+        if (dato.URL.includes("c21.com")) {
+            markerColor = 'black'; // Si la URL contiene "c21.com", el marcador es negro
+        } else if (dato.URL.includes("remax")) {
+            markerColor = 'blue'; // Si la URL contiene "remax", el marcador es azul
+        } else {
+            markerColor = 'red'; // Otros casos, el marcador será rojo (por ejemplo)
+        }
+
+        var marker = L.marker([dato.lat, dato.lng], {icon: L.divIcon({className: 'custom-div-icon', html: '<div style="background-color:'+markerColor+';" class="marker-pin"></div>'})}).addTo(mymap);
+
+        //var marker = L.marker([dato.lat, dato.lng]).addTo(mymap);
         
         var popupContent = "<b>" + dato.nombre + "</b><br>" +
                            "<b>Dirección:</b> " + dato.dir + "<br>" +
