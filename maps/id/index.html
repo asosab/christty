@@ -76,7 +76,7 @@
         location.URL = this[4];
 
         var stringOriginal = this[5];
-        var stringTruncado = stringOriginal.length > 600 ? stringOriginal.substring(0, 600) : stringOriginal;
+        var stringTruncado = stringOriginal.length > 500 ? stringOriginal.substring(0, 500)+'... ' : stringOriginal;
         location.des = stringTruncado;
 
         location.des = this[5];
