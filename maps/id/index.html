@@ -74,6 +74,11 @@
         location.lng = parseFloat(this[2]);
         location.dir = this[3];
         location.URL = this[4];
+
+        var stringOriginal = this[5];
+        var stringTruncado = stringOriginal.length > 600 ? stringOriginal.substring(0, 600) : stringOriginal;
+        location.des = stringTruncado;
+
         location.des = this[5];
         locations.push(location);
       });
@@ -83,7 +88,7 @@
 
       // Añadir capa de OpenStreetMap al mapa
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(mymap);
 
       // Iterar sobre los datos y añadir marcadores al mapa
