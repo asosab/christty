@@ -76,7 +76,12 @@
         location.URL = this[4];
 
         var stringOriginal = this[5];
-        var stringTruncado = stringOriginal.length > 500 ? stringOriginal.substring(0, 500)+'... ' : stringOriginal;
+        var totalChr = stringOriginal.length;
+        var chrMax = 500;
+        var faltan = 0; 
+        if (totalChr>chrMax) {faltan = totalChr - chrMax};
+        var frase = '... (y '+faltan+' caracteres más)';
+        var stringTruncado = totalChr > chrMax ? stringOriginal.substring(0, chrMax)+frase : stringOriginal;
         location.des = stringTruncado;
 
         location.des = this[5];
