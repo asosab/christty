@@ -75,8 +75,11 @@
         location.dir = this[3];
         location.URL = this[4];
 
-        var stringOriginal = this[5];
-        var totalChr = stringOriginal.length;
+
+        var stringOriginal = this[5]?this[5]:'';
+        let totalChr;
+        if (stringOriginal && stringOriginal.length > 0 ) { totalChr = stringOriginal.length;}
+        else{totalChr = 0;}
         var chrMax = 500;
         var faltan = 0; 
         if (totalChr>chrMax) {faltan = totalChr - chrMax};
